@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>Spring RabbitMQ for WoW</name>
-    <description>Educational project demonstrating the usage of RabbitMQ through the Spring framework to simulate exchange of messages between a event service and a player of a fictional game.</description>
+    <description>Educational project demonstrating the usage of RabbitMQ through the Spring framework to simulate exchange of messages between an event service and a player of a fictional game.</description>
 
     <developers>
 
@@ -98,21 +98,15 @@
         <version.imagej>1.53t</version.imagej>
         <version.hibernate.validator>1.0.0</version.hibernate.validator>
 
-        <!-- Hemajoo Commerce - Cherry dependencies -->
-<!--        <version.hemajoo.commerce.cherry.base>0.3.0-SNAPSHOT</version.hemajoo.commerce.cherry.base>-->
-
-        <!-- Flyway properties -->
-<!--        <flyway.locations>classpath:/db/migration/h2</flyway.locations>-->
-
         <!-- Sonar properties -->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.language>java</sonar.language>
         <sonar.java.libraries>target/classes</sonar.java.libraries>
-        <sonar.organization>hemajoo-commerce</sonar.organization>
+        <sonar.organization>hemajoo-education</sonar.organization>
         <sonar.projectKey>${project.groupId}:${project.artifactId}</sonar.projectKey>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
-        <sonar.projectName>Hemajoo Commerce Cherry Microservice Document</sonar.projectName>
+        <sonar.projectName>Spring RabbitMQ WoW</sonar.projectName>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.exclusions>**/resources/media/**/*,**/target/site/**/*,**/target/classes/media/**/*,**/apidocs/**/*,**/test/resources/**/*.jar,**/test-classes/media/**/*</sonar.exclusions>
         <sonar.coverage.exclusions>**/test/java/**/*</sonar.coverage.exclusions>
