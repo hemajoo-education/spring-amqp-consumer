@@ -5,11 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serializable;
-
 @ToString
 @Builder(setterPrefix = "with")
-public class MessageProtocol implements Serializable
+public class MessageProtocol
 {
     @Schema(description = "BaseMessage category type")
     @Getter

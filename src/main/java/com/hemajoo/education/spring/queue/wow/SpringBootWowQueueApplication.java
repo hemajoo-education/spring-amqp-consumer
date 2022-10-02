@@ -1,4 +1,4 @@
-package com.hemajoo.education.wow.queue;
+package com.hemajoo.education.spring.queue.wow;
 
 import com.hemajoo.education.wow.queue.actor.PlayerService;
 import com.hemajoo.education.wow.queue.actor.service.EventService;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackageClasses = { EventServiceController.class, EventService.class, PlayerService.class })
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
-public class QueueMessagingApplication
+public class SpringBootWowQueueApplication
 {
 //    public static final String topicExchangeName = "spring-boot-exchange";
 //
@@ -52,6 +52,6 @@ public class QueueMessagingApplication
 
     public static void main(String[] args)
     {
-        SpringApplication.run(QueueMessagingApplication.class, args);
+        SpringApplication.run(SpringBootWowQueueApplication.class, args);
     }
 }

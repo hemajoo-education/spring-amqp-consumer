@@ -45,7 +45,7 @@ public class EventServiceController
 //                .withEventReference(battleground)
 //                .build();
 //
-////        template.convertAndSend(QueueMessagingApplication.topicExchangeName, "foo.bar.baz", message);
+////        template.convertAndSend(SpringBootWowQueueApplication.topicExchangeName, "foo.bar.baz", message);
 //        template.convertAndSend(IMessageBrokerConfiguration.EXCHANGE_SERVICE_EVENT, IMessageBrokerConfiguration.ROUTING_KEY, message);
 //    }
 //

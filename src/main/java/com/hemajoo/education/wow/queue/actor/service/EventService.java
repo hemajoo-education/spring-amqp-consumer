@@ -1,6 +1,8 @@
 package com.hemajoo.education.wow.queue.actor.service;
 
-import com.hemajoo.education.wow.queue.commons.*;
+import com.hemajoo.education.wow.queue.commons.EventType;
+import com.hemajoo.education.wow.queue.commons.SenderIdentity;
+import com.hemajoo.education.wow.queue.commons.SenderType;
 import com.hemajoo.education.wow.queue.config.IMessageBrokerConfiguration;
 import com.hemajoo.education.wow.queue.event.message.EventNotificationMessage;
 import com.hemajoo.education.wow.queue.event.message.EventRequestMessage;
@@ -31,64 +33,61 @@ public class EventService
     @RabbitListener(queues = { IMessageBrokerConfiguration.QUEUE_SERVICE_EVENT })
     public void receiveServiceEvent(final @NonNull EventRequestMessage message)
     {
-        LOGGER.debug(String.format("Received on queue: '%s' a message of type: '%s'", IMessageBrokerConfiguration.QUEUE_SERVICE_EVENT, message.getClass().getSimpleName()));
+        LOGGER.debug(String.format("Received on queue: '%s' message of type: '%s'", IMessageBrokerConfiguration.QUEUE_SERVICE_EVENT, message.getClass().getSimpleName()));
 
-        switch (message.getEventType().getCategoryType())
+        EventType eventType = (EventType) message.getData();
+        if (eventType != null)
         {
-            case ARENA:
-                List<Integer> participants = arenas.get(message.getEventType());
-                if (participants == null)
-                {
-                    participants = new ArrayList<>();
-                }
-                Integer playerId = participants.stream().filter(participant -> participant.intValue() == message.getSenderIdentity().getId().intValue()).findFirst().orElse(null);
-                if (playerId != null)
-                {
-                    // Send an error to the sender as it is already registered for this event!
-                    EventNotificationMessage response = new EventNotificationMessage(
-                            MessageProtocol.builder()
-                                    .withMessageCategoryType(MessageCategoryType.MESSAGE_CATEGORY_EVENT)
-                                    .withMessageType(EventNotificationMessage.MessageType.MESSAGE_EVENT_NOTIFICATION_REGISTRATION_REJECTED)
-                                    .build(),
-                            SenderIdentity.builder()
-                                    .withType(SenderType.SERVICE_EVENT)
-                                    .withId(-1)
-                                    .build(),
-                            String.format("Entity: '%s' already registered for event: '%s'!", message.getSenderIdentity(), message.getEventType()),
-                            message.getEventType());
+            switch (eventType.getCategoryType())
+            {
+                case ARENA:
+                    List<Integer> participants = arenas.get(eventType);
+                    if (participants == null)
+                    {
+                        participants = new ArrayList<>();
+                    }
+                    Integer playerId = participants.stream().filter(participant -> participant.intValue() == message.getSender().getId().intValue()).findFirst().orElse(null);
+                    if (playerId != null)
+                    {
+                        // Send an error to the sender as it is already registered for this event!
+                        EventNotificationMessage response = new EventNotificationMessage(
+                                EventNotificationMessage.MessageType.MESSAGE_EVENT_NOTIFICATION_REGISTRATION_REJECTED,
+                                SenderIdentity.builder() // TODO Have a static method!
+                                        .withType(SenderType.SERVICE_EVENT)
+                                        .withId(-1)
+                                        .build(),
+                                eventType);
 
-                    MessageRouter.sendPlayerMessage(rabbitTemplate, response, message.getSenderIdentity());
-                }
-                else
-                {
-                    participants.add(message.getSenderIdentity().getId());
-                    arenas.put(message.getEventType(), participants);
-                    LOGGER.info(String.format("Player id: %s added to participants of event type: %s", message.getSenderIdentity().getId(), message.getEventType()));
+                        MessageRouter.sendPlayerMessage(rabbitTemplate, response, message.getSender());
+                    }
+                    else
+                    {
+                        participants.add(message.getSender().getId());
+                        arenas.put(eventType, participants);
+                        LOGGER.info(String.format("Player id: %s added to participants of event type: %s", message.getSender().getId(), eventType));
 
-                    // Send response to sender to confirm registration
-                    EventNotificationMessage response = new EventNotificationMessage(
-                            MessageProtocol.builder()
-                                    .withMessageCategoryType(MessageCategoryType.MESSAGE_CATEGORY_EVENT)
-                                    .withMessageType(EventNotificationMessage.MessageType.MESSAGE_EVENT_NOTIFICATION_REGISTRATION_ACCEPTED)
-                                    .build(),
-                            SenderIdentity.builder()
-                                    .withType(SenderType.SERVICE_EVENT)
-                                    .withId(-1)
-                                    .build(),
-                            message.getEventType());
+                        // Send response to sender to confirm registration
+                        EventNotificationMessage response = new EventNotificationMessage(
+                                EventNotificationMessage.MessageType.MESSAGE_EVENT_NOTIFICATION_REGISTRATION_ACCEPTED,
+                                SenderIdentity.builder()
+                                        .withType(SenderType.SERVICE_EVENT)
+                                        .withId(-1)
+                                        .build(),
+                                eventType);
 
-                    MessageRouter.sendPlayerMessage(rabbitTemplate,response, message.getSenderIdentity());
-                }
-                break;
+                        MessageRouter.sendPlayerMessage(rabbitTemplate,response, message.getSender());
+                    }
+                    break;
 
-            case BATTLEGROUND:
-                break;
+                case BATTLEGROUND:
+                    break;
 
-            case RAID:
-                break;
+                case RAID:
+                    break;
 
-            case DUNGEON:
-                break;
+                case DUNGEON:
+                    break;
+            }
         }
     }
 }
