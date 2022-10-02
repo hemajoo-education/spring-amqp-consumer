@@ -26,12 +26,14 @@
 package com.hemajoo.education.spring.queue.wow.message.broker;
 
 import com.hemajoo.education.spring.queue.wow.actor.service.event.ExchangeType;
+import lombok.NonNull;
+import org.aspectj.bridge.IMessage;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-public interface IRabbitService
+public interface IRabbitMQService
 {
     Queue getQueue();
 
@@ -42,4 +44,6 @@ public interface IRabbitService
     Binding getBinding();
 
     RabbitTemplate getTemplate();
+
+    void sendMessage(final @NonNull IMessage message, final String topicOrRoutingKey /*, final MessageHeader header*/);
 }

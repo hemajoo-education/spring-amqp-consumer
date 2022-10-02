@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hemajoo.education</groupId>
-    <artifactId>spring-rabbitmq</artifactId>
+    <artifactId>spring-rabbitmq-wow</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Spring Queue</name>
-    <description>Educational project demonstrating usage of RabbitMQ through Spring.</description>
+    <name>Spring RabbitMQ for WoW</name>
+    <description>Educational project demonstrating the usage of RabbitMQ through the Spring framework to simulate exchange of messages between a event service and a player of a fictional game.</description>
 
     <developers>
 
@@ -27,10 +27,10 @@
     </developers>
 
     <scm>
-        <url>https://github.com/hemajoo-education/spring-queue</url>
-        <connection>scm:git:ssh://git@github.com/hemajoo-education/spring-queue.git</connection>
+        <url>https://github.com/hemajoo-education/spring-rabbitmp-wow</url>
+        <connection>scm:git:ssh://git@github.com/hemajoo-education/spring-rabbitmp-wow.git</connection>
         <!--suppress UnresolvedMavenProperty -->
-        <developerConnection>scm:git:[push=]ssh://git@github.com/hemajoo-education/spring-queue.git[fetch=]ssh://git@github.com/hemajoo-education/spring-queue.git</developerConnection>
+        <developerConnection>scm:git:[push=]ssh://git@github.com/hemajoo-education/spring-rabbitmp-wow.git[fetch=]ssh://git@github.com/hemajoo-education/spring-rabbitmp-wow.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -99,10 +99,10 @@
         <version.hibernate.validator>1.0.0</version.hibernate.validator>
 
         <!-- Hemajoo Commerce - Cherry dependencies -->
-        <version.hemajoo.commerce.cherry.base>0.3.0-SNAPSHOT</version.hemajoo.commerce.cherry.base>
+<!--        <version.hemajoo.commerce.cherry.base>0.3.0-SNAPSHOT</version.hemajoo.commerce.cherry.base>-->
 
         <!-- Flyway properties -->
-        <flyway.locations>classpath:/db/migration/h2</flyway.locations>
+<!--        <flyway.locations>classpath:/db/migration/h2</flyway.locations>-->
 
         <!-- Sonar properties -->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -124,9 +124,9 @@
     <distributionManagement>
 
         <repository>
-            <id>github.hemajoo-commerce.maven.registry</id>
-            <name>GitHub Hemajoo Commerce - Maven Registry</name>
-            <url>https://maven.pkg.github.com/hemajoo-commerce/maven-registry</url>
+            <id>github.hemajoo-education.maven.registry</id>
+            <name>GitHub Hemajoo Education - Maven Registry</name>
+            <url>https://maven.pkg.github.com/hemajoo-education</url>
         </repository>
 
     </distributionManagement>
@@ -143,18 +143,6 @@
             </snapshots>
         </repository>
 
-<!--        <repository>-->
-<!--            <id>github.ressec.maven.registry</id>-->
-<!--            <name>GitHub ResseC - Maven Registry</name>-->
-<!--            <url>https://maven.pkg.github.com/ressec/*</url>-->
-<!--            <snapshots>-->
-<!--                <enabled>true</enabled>-->
-<!--            </snapshots>-->
-<!--            <releases>-->
-<!--                <enabled>true</enabled>-->
-<!--            </releases>-->
-<!--        </repository>-->
-
         <repository>
             <id>github.hemajoo.maven.registry</id>
             <name>GitHub Hemajoo - Maven Registry</name>
@@ -168,9 +156,9 @@
         </repository>
 
         <repository>
-            <id>github.hemajoo-commerce.maven.registry</id>
-            <name>GitHub Hemajoo Commerce - Maven Registry</name>
-            <url>https://maven.pkg.github.com/hemajoo-commerce/*</url>
+            <id>github.hemajoo.education.maven.registry</id>
+            <name>GitHub Hemajoo Education - Maven Registry</name>
+            <url>https://maven.pkg.github.com/hemajoo-education/*</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -215,11 +203,6 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-data-jpa</artifactId>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

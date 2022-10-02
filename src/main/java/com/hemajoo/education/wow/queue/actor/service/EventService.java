@@ -21,13 +21,13 @@ import java.util.List;
 @Component
 public class EventService
 {
-    private final RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate template;
 
     private EnumMap<EventType, List<Integer>> arenas = new EnumMap<>(EventType.class);
 
-    public EventService(RabbitTemplate rabbitTemplate)
+    public EventService(RabbitTemplate template)
     {
-        this.rabbitTemplate = rabbitTemplate;
+        this.template = template;
     }
 
     @RabbitListener(queues = { IMessageBrokerConfiguration.QUEUE_SERVICE_EVENT })
@@ -58,7 +58,7 @@ public class EventService
                                         .build(),
                                 eventType);
 
-                        MessageRouter.sendPlayerMessage(rabbitTemplate, response, message.getSender());
+                        MessageRouter.sendPlayerMessage(template, response, message.getSender());
                     }
                     else
                     {
@@ -75,7 +75,7 @@ public class EventService
                                         .build(),
                                 eventType);
 
-                        MessageRouter.sendPlayerMessage(rabbitTemplate,response, message.getSender());
+                        MessageRouter.sendPlayerMessage(template,response, message.getSender());
                     }
                     break;
 

@@ -32,7 +32,7 @@ import org.aspectj.bridge.IMessage;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-public class RabbitService implements IRabbitService
+public class RabbitMQService implements IRabbitMQService
 {
     @Getter
     private final RabbitTemplate template;
@@ -53,7 +53,7 @@ public class RabbitService implements IRabbitService
 //    private Header header;
 
     @Builder(setterPrefix = "with")
-    public RabbitService(final @NonNull RabbitTemplate template, final @NonNull String queueName, final @NonNull String exchangeName, final ExchangeType exchangeType, final String routingKey, final String topic)
+    public RabbitMQService(final @NonNull RabbitTemplate template, final @NonNull String queueName, final @NonNull String exchangeName, final ExchangeType exchangeType, final String routingKey, final String topic)
     {
         this.template = template;
         this.queue = new Queue(queueName);
@@ -92,7 +92,8 @@ public class RabbitService implements IRabbitService
 //
 //    }
 
-    public final void send(final @NonNull IMessage message, final String topicOrRoutingKey /*, final MessageHeader header*/)
+    @Override
+    public final void sendMessage(final @NonNull IMessage message, final String topicOrRoutingKey /*, final MessageHeader header*/)
     {
 //        EventRequestMessage message = new EventRequestMessage(
 //                SenderIdentity.builder()
