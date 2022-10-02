@@ -4,13 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
-
     <groupId>com.hemajoo.education</groupId>
     <artifactId>spring-queue</artifactId>
     <version>0.1.0-SNAPSHOT</version>
@@ -75,6 +68,8 @@
         <version.plugin.maven.jacoco>0.8.8</version.plugin.maven.jacoco>
 
         <!-- Dependencies version properties -->
+        <version.hemajoo>0.1.0-SNAPSHOT</version.hemajoo>
+
         <version.springdoc.openapi>1.6.6</version.springdoc.openapi>                                               <!-- Last updated: 2022-09-21 -->
         <version.google.guava>31.1-jre</version.google.guava>
         <version.junit.jupiter>5.9.1</version.junit.jupiter>                                                        <!-- Last updated: 2022-09-21 -->
@@ -148,10 +143,22 @@
             </snapshots>
         </repository>
 
+<!--        <repository>-->
+<!--            <id>github.ressec.maven.registry</id>-->
+<!--            <name>GitHub ResseC - Maven Registry</name>-->
+<!--            <url>https://maven.pkg.github.com/ressec/*</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--            </snapshots>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--            </releases>-->
+<!--        </repository>-->
+
         <repository>
-            <id>github.ressec.maven.registry</id>
-            <name>GitHub ResseC - Maven Registry</name>
-            <url>https://maven.pkg.github.com/ressec/*</url>
+            <id>github.hemajoo.maven.registry</id>
+            <name>GitHub Hemajoo - Maven Registry</name>
+            <url>https://maven.pkg.github.com/hemajoo/*</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -335,6 +342,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${version.google.guava}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hemajoo</groupId>
+            <artifactId>hemajoo-utilities</artifactId>
+            <version>${version.hemajoo}</version>
         </dependency>
 
     </dependencies>

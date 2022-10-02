@@ -1,38 +1,43 @@
 package com.hemajoo.education.wow.queue.event.message;
 
+import com.hemajoo.education.wow.queue.commons.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serializable;
-
-@ToString
+@ToString(callSuper = true)
 @Schema(description = "Event request message")
-@Builder(setterPrefix = "with")
-public class EventRequestMessage implements Serializable
+public class EventRequestMessage extends BaseMessage
 {
-    @Schema(description = "Sender type")
-    @Getter
-    private String senderType; // PLAYER
-
-    @Schema(description = "Sender identity")
-    @Getter
-    private String senderIdentity; // 1
-
-    @Schema(description = "Message category type")
-    @Getter
-    private String messageCategoryType; // MESSAGE_CATEGORY_EVENT
-
-    @Schema(description = "Message type")
-    @Getter
-    private String messageType; // MESSAGE_EVENT_REGISTRATION_REQUEST
-
     @Schema(description = "Event type")
     @Getter
-    private String eventType; // BATTLEGROUND
+    private EventType eventType;
 
-    @Schema(description = "Event reference")
-    @Getter
-    private String eventReference; // Warsong Gulch
+    public enum MessageType implements IMessageType
+    {
+        MESSAGE_EVENT_REGISTRATION_REQUEST(MessageCategoryType.MESSAGE_CATEGORY_EVENT); // PLAYER -> SERVICE AGENT
+
+        @Getter
+        private MessageCategoryType categoryType;
+
+        MessageType(final MessageCategoryType categoryType)
+        {
+            this.categoryType = categoryType;
+        }
+
+//        public static EventNotificationMessage.MessageType from(EventNotificationMessage.MessageType type)
+//        {
+//            return Arrays.stream(EventNotificationMessage.MessageType.values()).filter(e -> e == type).findFirst().orElse(null);
+//        }
+    }
+
+    public EventRequestMessage(SenderIdentity senderIdentity, EventType event)
+    {
+        super(senderIdentity, MessageProtocol.builder()
+                .withMessageCategoryType(MessageCategoryType.MESSAGE_CATEGORY_EVENT)
+                .withMessageType(EventRequestMessage.MessageType.MESSAGE_EVENT_REGISTRATION_REQUEST)
+                .build());
+
+        this.eventType = event;
+    }
 }

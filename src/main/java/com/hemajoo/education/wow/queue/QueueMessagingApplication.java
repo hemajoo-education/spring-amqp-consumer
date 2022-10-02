@@ -1,13 +1,15 @@
 package com.hemajoo.education.wow.queue;
 
-import com.hemajoo.education.wow.queue.event.consumer.WowServiceEvent;
-import com.hemajoo.education.wow.queue.event.producer.WowEventMessageController;
+import com.hemajoo.education.wow.queue.actor.PlayerService;
+import com.hemajoo.education.wow.queue.actor.service.EventService;
+import com.hemajoo.education.wow.queue.actor.service.EventServiceController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(basePackageClasses = { WowEventMessageController.class, WowServiceEvent.class })
-@SpringBootApplication
+@ComponentScan(basePackageClasses = { EventServiceController.class, EventService.class, PlayerService.class })
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class QueueMessagingApplication
 {
 //    public static final String topicExchangeName = "spring-boot-exchange";
