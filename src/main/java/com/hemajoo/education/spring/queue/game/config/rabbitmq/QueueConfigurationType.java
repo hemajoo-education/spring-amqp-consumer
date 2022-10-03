@@ -12,32 +12,20 @@
  * Hemajoo Systems Inc.
  * -----------------------------------------------------------------------------------------------
  */
-package com.hemajoo.education.spring.queue.wow.message.broker;
+package com.hemajoo.education.spring.queue.game.config.rabbitmq;
 
-import com.hemajoo.education.spring.queue.game.config.GameQueueConfiguration;
-import com.hemajoo.education.wow.queue.commons.SenderIdentity;
+import lombok.Getter;
 import lombok.NonNull;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-public interface IRabbitMQService
+public enum QueueConfigurationType
 {
-//    Queue getQueue();
+    QUEUE_SERVICE_EVENT(IGameRabbitMQNames.SERVICE_EVENT_QUEUE_NAME);
 
-//    ExchangeType getExchangeType();
+    @Getter
+    private final String queueName;
 
-//    Exchange getExchange();
-
-//    Binding getBinding();
-
-    GameQueueConfiguration getQueueConfiguration();
-
-    RabbitTemplate getTemplate();
-
-    /**
-     * Return the service identity.
-     * @return Identity.
-     */
-    SenderIdentity getIdentity();
-
-    void sendMessage(final @NonNull IMessage message, final String topicOrRoutingKey /*, final MessageHeader header*/);
+    QueueConfigurationType(final @NonNull String queueName)
+    {
+        this.queueName = queueName;
+    }
 }

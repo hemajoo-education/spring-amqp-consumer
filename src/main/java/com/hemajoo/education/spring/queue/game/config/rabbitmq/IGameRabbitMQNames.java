@@ -12,32 +12,19 @@
  * Hemajoo Systems Inc.
  * -----------------------------------------------------------------------------------------------
  */
-package com.hemajoo.education.spring.queue.wow.message.broker;
+package com.hemajoo.education.spring.queue.game.config.rabbitmq;
 
-import com.hemajoo.education.spring.queue.game.config.GameQueueConfiguration;
-import com.hemajoo.education.wow.queue.commons.SenderIdentity;
-import lombok.NonNull;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
-public interface IRabbitMQService
+public interface IGameRabbitMQNames
 {
-//    Queue getQueue();
+    // QUEUES
+    String SERVICE_EVENT_QUEUE_NAME = "com.hemajoo.education.spring.message.broker.game.service.event.queue";
 
-//    ExchangeType getExchangeType();
+    String PLAYER_EVENT_QUEUE_NAME = "com.hemajoo.education.spring.message.broker.player.AKGHY14589JUIK.event.queue"; // TODO Dynamically build exchange name: com.hemajoo.education.spring-rabbitmq.player.${playerReference}.event.queue
 
-//    Exchange getExchange();
 
-//    Binding getBinding();
+    // EXCHANGES
 
-    GameQueueConfiguration getQueueConfiguration();
-
-    RabbitTemplate getTemplate();
-
-    /**
-     * Return the service identity.
-     * @return Identity.
-     */
-    SenderIdentity getIdentity();
-
-    void sendMessage(final @NonNull IMessage message, final String topicOrRoutingKey /*, final MessageHeader header*/);
+    String SERVICE_EXCHANGE_NAME = "com.hemajoo.education.spring.message.broker.game.service.direct-exchange";
+    String PLAYER_EVENT_EXCHANGE_NAME = "com.hemajoo.education.spring.message.broker.game.player.event.direct-exchange";
 }
+

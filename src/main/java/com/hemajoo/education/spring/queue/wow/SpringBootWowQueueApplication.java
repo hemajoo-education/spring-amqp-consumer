@@ -1,17 +1,54 @@
 package com.hemajoo.education.spring.queue.wow;
 
-import com.hemajoo.education.wow.queue.actor.PlayerService;
-import com.hemajoo.education.wow.queue.actor.service.EventService;
-import com.hemajoo.education.wow.queue.actor.service.EventServiceController;
+import com.hemajoo.education.spring.amqp.agent.PlayerAgent;
+import com.hemajoo.education.spring.amqp.base.agent.AgentConfigurationException;
+import com.hemajoo.education.spring.amqp.base.agent.AgentType;
+import com.hemajoo.education.spring.amqp.base.agent.QueueType;
+import com.hemajoo.education.wow.queue.actor.service.GameEventServiceController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(basePackageClasses = { EventServiceController.class, EventService.class, PlayerService.class })
+@ComponentScan(basePackageClasses = { GameEventServiceController.class, Runner.class /*, EventService.class, GamePlayerService.class*/ })
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class SpringBootWowQueueApplication
 {
+    @Bean
+    PlayerAgent playerAgent() throws AgentConfigurationException
+    {
+        return new PlayerAgent(
+                AgentType.PLAYER,
+                "AKGHY14589JUIK",
+                QueueType.DEFAULT,
+                "com.hemajoo.education.spring.amqp.player.${key}.default");
+    }
+
+//    @Bean
+//    GameEventService gameEventService()
+//    {
+//        return new GameEventService(
+//                new RabbitTemplate(),
+//                SenderIdentity.builder()
+//                        .withType(ParticipantType.SERVICE_EVENT)
+//                        .withReference(null)
+//                        .build(),
+//                GameQueueConfiguration.MQ_SERVICE_EVENT);
+//    }
+
+//    @Bean
+//    GamePlayerService gamePlayerService()
+//    {
+//        return new GamePlayerService(
+//                new RabbitTemplate(),
+//                SenderIdentity.builder()
+//                        .withType(ParticipantType.PLAYER)
+//                        .withReference("AKGHY14589JUIK")
+//                        .build(),
+//                GameQueueConfiguration.MQ_PLAYER_EVENT);
+//    }
+
 //    public static final String topicExchangeName = "spring-boot-exchange";
 //
 //    public static final String queueName = "spring-boot";

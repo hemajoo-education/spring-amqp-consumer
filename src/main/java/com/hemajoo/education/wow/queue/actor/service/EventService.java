@@ -1,8 +1,8 @@
 package com.hemajoo.education.wow.queue.actor.service;
 
 import com.hemajoo.education.wow.queue.commons.EventType;
+import com.hemajoo.education.wow.queue.commons.ParticipantType;
 import com.hemajoo.education.wow.queue.commons.SenderIdentity;
-import com.hemajoo.education.wow.queue.commons.SenderType;
 import com.hemajoo.education.wow.queue.config.IMessageBrokerConfiguration;
 import com.hemajoo.education.wow.queue.event.message.EventNotificationMessage;
 import com.hemajoo.education.wow.queue.event.message.EventRequestMessage;
@@ -11,19 +11,18 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
 @Log4j2
-@Component
+//@Component
 public class EventService
 {
     private final RabbitTemplate template;
 
-    private EnumMap<EventType, List<Integer>> arenas = new EnumMap<>(EventType.class);
+    private final EnumMap<EventType, List<String>> arenas = new EnumMap<>(EventType.class);
 
     public EventService(RabbitTemplate template)
     {
@@ -41,20 +40,20 @@ public class EventService
             switch (eventType.getCategoryType())
             {
                 case ARENA:
-                    List<Integer> participants = arenas.get(eventType);
+                    List<String> participants = arenas.get(eventType);
                     if (participants == null)
                     {
                         participants = new ArrayList<>();
                     }
-                    Integer playerId = participants.stream().filter(participant -> participant.intValue() == message.getSender().getId().intValue()).findFirst().orElse(null);
+                    String playerId = participants.stream().filter(participant -> participant.equals(message.getSender().getReference())).findFirst().orElse(null);
                     if (playerId != null)
                     {
                         // Send an error to the sender as it is already registered for this event!
                         EventNotificationMessage response = new EventNotificationMessage(
                                 EventNotificationMessage.MessageType.MESSAGE_EVENT_NOTIFICATION_REGISTRATION_REJECTED,
                                 SenderIdentity.builder() // TODO Have a static method!
-                                        .withType(SenderType.SERVICE_EVENT)
-                                        .withId(-1)
+                                        .withType(ParticipantType.SERVICE_EVENT)
+                                        .withReference(null)
                                         .build(),
                                 eventType);
 
@@ -62,16 +61,16 @@ public class EventService
                     }
                     else
                     {
-                        participants.add(message.getSender().getId());
+                        participants.add(message.getSender().getReference());
                         arenas.put(eventType, participants);
-                        LOGGER.info(String.format("Player id: %s added to participants of event type: %s", message.getSender().getId(), eventType));
+                        LOGGER.info(String.format("Player id: %s added to participants of event type: %s", message.getSender().getReference(), eventType));
 
                         // Send response to sender to confirm registration
                         EventNotificationMessage response = new EventNotificationMessage(
                                 EventNotificationMessage.MessageType.MESSAGE_EVENT_NOTIFICATION_REGISTRATION_ACCEPTED,
                                 SenderIdentity.builder()
-                                        .withType(SenderType.SERVICE_EVENT)
-                                        .withId(-1)
+                                        .withType(ParticipantType.SERVICE_EVENT)
+                                        .withReference(null)
                                         .build(),
                                 eventType);
 

@@ -1,7 +1,6 @@
 package com.hemajoo.education.wow.queue.util;
 
 import com.hemajoo.education.wow.queue.commons.SenderIdentity;
-import com.hemajoo.education.wow.queue.config.IMessageBrokerConfiguration;
 import com.hemajoo.education.wow.queue.event.message.BaseMessage;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -14,18 +13,22 @@ import org.springframework.amqp.support.converter.SimpleMessageConverter;
 @UtilityClass
 public class MessageRouter
 {
-    public static void sendPlayerMessage(final @NonNull RabbitTemplate template, final @NonNull BaseMessage message, final SenderIdentity playerIdentity)
+    public static void sendPlayerMessage(final @NonNull RabbitTemplate template, final @NonNull BaseMessage message, final SenderIdentity identity)
     {
-        sendPlayerMessage(template, message, playerIdentity.getId());
+        sendPlayerMessage(template, message, identity.getReference());
     }
 
-    public static void sendPlayerMessage(final @NonNull RabbitTemplate template, final @NonNull BaseMessage message, final int playerId)
+    public static void sendPlayerMessage(final @NonNull RabbitTemplate template, final @NonNull BaseMessage message, final String playerReference)
     {
         MessageProperties properties = new MessageProperties();
-        properties.setHeader("playerId", Integer.toString(playerId));
+        properties.setHeader("playerReference", playerReference);
         MessageConverter messageConverter = new SimpleMessageConverter();
         Message m = messageConverter.toMessage(message, properties);
 
-        template.convertAndSend(IMessageBrokerConfiguration.EXCHANGE_PLAYER_EVENT, "", m);
+//        template.convertAndSend(IMessageBrokerConfiguration.EXCHANGE_PLAYER_EVENT, "", m);
+        //template.convertAndSend(IGameRabbitMQNames.PLAYER_EVENT_EXCHANGE_NAME, "", m);
+
+        // Send message directly to a queue
+        template.convertAndSend("com.hemajoo.education.spring.amqp.player.AKGHY14589JUIK.event", message);
     }
 }

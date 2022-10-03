@@ -1,6 +1,6 @@
 package com.hemajoo.education.wow.queue.commons;
 
-public enum SenderType
+public enum ParticipantType
 {
     PLAYER,
 

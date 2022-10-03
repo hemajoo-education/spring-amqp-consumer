@@ -14,12 +14,11 @@
  */
 package com.hemajoo.education.spring.queue.wow.message.broker;
 
-import com.hemajoo.education.spring.queue.wow.actor.service.event.ExchangeType;
+import com.hemajoo.education.spring.queue.game.config.GameQueueConfiguration;
+import com.hemajoo.education.wow.queue.commons.SenderIdentity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import org.aspectj.bridge.IMessage;
-import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 public class RabbitMQService implements IRabbitMQService
@@ -28,53 +27,61 @@ public class RabbitMQService implements IRabbitMQService
     private final RabbitTemplate template;
 
     @Getter
-    private Queue queue;
+    private final GameQueueConfiguration queueConfiguration;
+
+//    @Getter
+//    private final Queue queue;
+//
+//    @Getter
+//    private Exchange exchange;
+//
+//    @Getter
+//    private final ExchangeType exchangeType;
+//
+//    @Getter
+//    private Binding binding;
 
     @Getter
-    private Exchange exchange;
-
-    @Getter
-    private ExchangeType exchangeType;
-
-    @Getter
-    private Binding binding;
+    private final SenderIdentity identity;
 
 //    @Getter
 //    private Header header;
 
     @Builder(setterPrefix = "with")
-    public RabbitMQService(final @NonNull RabbitTemplate template, final @NonNull String queueName, final @NonNull String exchangeName, final ExchangeType exchangeType, final String routingKey, final String topic)
+    public RabbitMQService(final @NonNull RabbitTemplate template, final @NonNull SenderIdentity identity, final @NonNull GameQueueConfiguration queueConfiguration)
     {
         this.template = template;
-        this.queue = new Queue(queueName);
-        this.exchangeType = exchangeType;
+        this.queueConfiguration = queueConfiguration;
+//        this.queue = new Queue(queueName);
+//        this.exchangeType = exchangeType;
+        this.identity = identity;
 
-        switch (exchangeType)
-        {
-            case DIRECT:
-                this.exchange = new DirectExchange(exchangeName);
-                if (routingKey != null)
-                {
-                    this.binding = BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
-                }
-                break;
-
-            case FANOUT:
-                this.exchange = new FanoutExchange(exchangeName);
-                break;
-
-            case TOPIC:
-                this.exchange = new TopicExchange(exchangeName);
-                if (topic != null)
-                {
-                    this.binding = BindingBuilder.bind(queue).to(exchange).with(topic).noargs();
-                }
-                break;
-
-            case HEADER:
-                this.exchange = new HeadersExchange(exchangeName);
-                break;
-        }
+//        switch (exchangeType)
+//        {
+//            case DIRECT:
+//                this.exchange = new DirectExchange(exchangeName);
+//                if (routingKey != null)
+//                {
+//                    this.binding = BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
+//                }
+//                break;
+//
+//            case FANOUT:
+//                this.exchange = new FanoutExchange(exchangeName);
+//                break;
+//
+//            case TOPIC:
+//                this.exchange = new TopicExchange(exchangeName);
+//                if (topic != null)
+//                {
+//                    this.binding = BindingBuilder.bind(queue).to(exchange).with(topic).noargs();
+//                }
+//                break;
+//
+//            case HEADER:
+//                this.exchange = new HeadersExchange(exchangeName);
+//                break;
+//        }
     }
 
 //    public void setHeader(final @NonNull Header header)
@@ -87,11 +94,12 @@ public class RabbitMQService implements IRabbitMQService
     {
 //        EventRequestMessage message = new EventRequestMessage(
 //                SenderIdentity.builder()
-//                        .withType(SenderType.PLAYER)
+//                        .withType(ParticipantType.PLAYER)
 //                        .withId(senderId)
 //                        .build(),
 //                EventType.from(dungeonName));
 
-        template.convertAndSend(exchange.getName(), topicOrRoutingKey != null ? topicOrRoutingKey : "", message);
+//        template.convertAndSend(exchange.getName(), topicOrRoutingKey != null ? topicOrRoutingKey : "", message);
+        template.convertAndSend(queueConfiguration.getExchangeConfiguration().getExchangeName(), topicOrRoutingKey != null ? topicOrRoutingKey : "", message);
     }
 }

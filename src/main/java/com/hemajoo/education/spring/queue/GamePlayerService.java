@@ -1,6 +1,23 @@
-package com.hemajoo.education.wow.queue.actor;
+/*
+ * (C) Copyright Hemajoo Systems Inc.  2022 - All Rights Reserved
+ * -----------------------------------------------------------------------------------------------
+ * All information contained herein is, and remains the property of
+ * Hemajoo Inc. and its suppliers, if any. The intellectual and technical
+ * concepts contained herein are proprietary to Hemajoo Inc. and its
+ * suppliers and may be covered by U.S. and Foreign Patents, patents
+ * in process, and are protected by trade secret or copyright law.
+ *
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained from
+ * Hemajoo Systems Inc.
+ * -----------------------------------------------------------------------------------------------
+ */
+package com.hemajoo.education.spring.queue;
 
+import com.hemajoo.education.spring.queue.game.config.GameQueueConfiguration;
+import com.hemajoo.education.spring.queue.wow.message.broker.RabbitMQService;
 import com.hemajoo.education.wow.queue.commons.EventType;
+import com.hemajoo.education.wow.queue.commons.SenderIdentity;
 import com.hemajoo.education.wow.queue.config.IMessageBrokerConfiguration;
 import com.hemajoo.education.wow.queue.event.message.BaseMessage;
 import com.hemajoo.education.wow.queue.event.message.EventNotificationMessage;
@@ -8,20 +25,18 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Component;
 
 @Log4j2
-@Component
-public class PlayerService
+public class GamePlayerService extends RabbitMQService
 {
-    private final RabbitTemplate template;
+//    private final RabbitTemplate template;
 
-    public PlayerService(RabbitTemplate template)
+    public GamePlayerService(final @NonNull RabbitTemplate template, final SenderIdentity identity, final @NonNull GameQueueConfiguration queueConfiguration)
     {
-        this.template = template;
+        super(template, identity, queueConfiguration);
     }
 
-    @RabbitListener(queues = { IMessageBrokerConfiguration.QUEUE_PLAYER_1_EVENT })
+    @RabbitListener(queues = { "com.hemajoo.education.spring.amqp.player.AKGHY14589JUIK.default" })
     public void receivedEventMessage(final @NonNull BaseMessage message)
     {
         if (message instanceof EventNotificationMessage)

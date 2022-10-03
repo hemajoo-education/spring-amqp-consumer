@@ -12,32 +12,25 @@
  * Hemajoo Systems Inc.
  * -----------------------------------------------------------------------------------------------
  */
-package com.hemajoo.education.spring.queue.wow.message.broker;
+package com.hemajoo.education.spring.queue.wow;
 
-import com.hemajoo.education.spring.queue.game.config.GameQueueConfiguration;
-import com.hemajoo.education.wow.queue.commons.SenderIdentity;
-import lombok.NonNull;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.hemajoo.education.spring.amqp.agent.PlayerAgent;
+import com.hemajoo.education.spring.amqp.base.agent.QueueType;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
-public interface IRabbitMQService
+@Log4j2
+@Component
+public class Runner implements CommandLineRunner
 {
-//    Queue getQueue();
+    @Autowired
+    private PlayerAgent player;
 
-//    ExchangeType getExchangeType();
-
-//    Exchange getExchange();
-
-//    Binding getBinding();
-
-    GameQueueConfiguration getQueueConfiguration();
-
-    RabbitTemplate getTemplate();
-
-    /**
-     * Return the service identity.
-     * @return Identity.
-     */
-    SenderIdentity getIdentity();
-
-    void sendMessage(final @NonNull IMessage message, final String topicOrRoutingKey /*, final MessageHeader header*/);
+    @Override
+    public void run(String... args) throws Exception
+    {
+        player.addQueueDefinition(QueueType.EVENT, "com.hemajoo.education.spring.amqp.player.${key}.event", "onEventMessage");
+    }
 }

@@ -8,16 +8,19 @@ import lombok.ToString;
 import java.io.Serializable;
 
 @ToString
-@Schema(description = "Sender identity")
+@Schema(description = "Message sender identity")
 @Builder(setterPrefix = "with")
 public class SenderIdentity implements Serializable
 {
+    @Getter
     @Schema(description = "Sender type")
-    @Getter
-    private SenderType type;
+    private ParticipantType type;
 
-    @Schema(description = "Sender identity")
     @Getter
-    private Integer id;
+    @Schema(description = "Sender reference")
+    private String reference;
 
+    @Getter
+    @Schema(description = "Sender topic or routing key")
+    private String topicOrRoutingKey;
 }
