@@ -9,7 +9,7 @@
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Spring AMQP Consumer</name>
+    <name>Spring - AMQP (RabbitMQ) Consumer</name>
     <description>Educational project demonstrating the usage of RabbitMQ through the Spring framework.</description>
 
     <developers>
@@ -106,7 +106,7 @@
         <sonar.organization>hemajoo-education</sonar.organization>
         <sonar.projectKey>${project.groupId}:${project.artifactId}</sonar.projectKey>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
-        <sonar.projectName>Spring RabbitMQ WoW</sonar.projectName>
+        <sonar.projectName>${project.name}</sonar.projectName>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.exclusions>**/resources/media/**/*,**/target/site/**/*,**/target/classes/media/**/*,**/apidocs/**/*,**/test/resources/**/*.jar,**/test-classes/media/**/*</sonar.exclusions>
         <sonar.coverage.exclusions>**/test/java/**/*</sonar.coverage.exclusions>
