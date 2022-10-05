@@ -15,6 +15,7 @@
 package com.hemajoo.education.spring.amqp.base.agent;
 
 import lombok.NonNull;
+import org.springframework.amqp.core.Queue;
 
 /**
  * An <b>AMQP</b> (Advanced Messaging Querying Protocol) agent.
@@ -32,12 +33,16 @@ public interface IRabbitAgent
      */
     String getKey();
 
+    AgentType getType();
+
     /**
-     * Returns the name of the queue for this agent given a queue type. If no specific queue has been declared, then the agent's default queue is returned.
+     * Return a queue given its queue type. If no specific queue has been declared, then the agent's default queue is returned.
      * @param queueType Queue type.
-     * @return Queue name.
+     * @return Queue.
      */
-    String getQueueNameFor(final @NonNull QueueType queueType);
+    Queue getQueueByType(final @NonNull QueueType queueType);
+
+    void addQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName, final @NonNull Object delegate, final String methodListener) throws AgentConfigurationException;
 
     /**
      * Adds a queue definition for the agent.
@@ -51,4 +56,6 @@ public interface IRabbitAgent
     void removeQueueDefinition(final @NonNull QueueType queueType);
 
     void updateQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName);
+
+    void addDirectExchangeDefinition(final @NonNull QueueType queueType, final @NonNull String exchangeName, final String routingKey) throws AgentConfigurationException;
 }

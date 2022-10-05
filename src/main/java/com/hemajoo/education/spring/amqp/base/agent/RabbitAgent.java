@@ -22,6 +22,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -36,7 +38,7 @@ import java.util.EnumMap;
 @Log4j2
 public abstract class RabbitAgent implements IRabbitAgent
 {
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Autowired
     private final AmqpAdmin rabbitAdmin;
@@ -59,7 +61,7 @@ public abstract class RabbitAgent implements IRabbitAgent
     /**
      * Collection of queues (by queue type).
      */
-    private final EnumMap<QueueType, String> queues = new EnumMap<>(QueueType.class);
+    private final EnumMap<QueueType, Queue> queues = new EnumMap<>(QueueType.class);
 
     /**
      * Create a new <b>RabbitMQ</b> agent.
@@ -78,15 +80,21 @@ public abstract class RabbitAgent implements IRabbitAgent
     }
 
     @Override
-    public final String getQueueNameFor(@NonNull QueueType queueType)
+    public final Queue getQueueByType(@NonNull QueueType queueType)
     {
-        String name = queues.get(queueType);
+        Queue queue = queues.get(queueType);
 
-        return name != null ? name : queues.get(QueueType.DEFAULT);
+        return queue != null ? queue : queues.get(QueueType.DEFAULT);
     }
 
     @Override
     public final void addQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName, final String methodListener) throws AgentConfigurationException
+    {
+        addQueueDefinition(queueType, queueName, this, methodListener);
+    }
+
+    @Override
+    public final void addQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName, final @NonNull Object delegate, final String methodListener) throws AgentConfigurationException
     {
         String name = queueName;
 
@@ -100,8 +108,9 @@ public abstract class RabbitAgent implements IRabbitAgent
             try
             {
                 name = StringExpander.expandVariables(this, name);
-                queues.put(queueType, name);
-                rabbitAdmin.declareQueue(new Queue(name));
+                Queue queue = new Queue(name);
+                queues.put(queueType, queue);
+                rabbitAdmin.declareQueue(queue);
 
                 LOGGER.debug(String.format("Successfully declared queue: '%s' for agent: '%s-%s'", name, type, key));
 
@@ -110,7 +119,7 @@ public abstract class RabbitAgent implements IRabbitAgent
                     SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
                     container.setConnectionFactory(connectionFactory);
                     container.setQueueNames(name);
-                    container.setMessageListener(new MessageListenerAdapter(this, methodListener));
+                    container.setMessageListener(new MessageListenerAdapter(delegate, methodListener));
                     container.start();
                 }
             }
@@ -120,6 +129,35 @@ public abstract class RabbitAgent implements IRabbitAgent
             }
         }
     }
+
+    @Override
+    public final void addDirectExchangeDefinition(final @NonNull QueueType queueType, final @NonNull String exchangeName, final String routingKey) throws AgentConfigurationException
+    {
+        String name;
+
+        Queue queue = getQueueByType(queueType);
+
+        if (queue != null)
+        {
+            if (StringExpander.containsVariable(exchangeName))
+            {
+                try
+                {
+                    name = StringExpander.expandVariables(this, exchangeName);
+                    DirectExchange exchange = new DirectExchange(name);
+                    rabbitAdmin.declareExchange(exchange);
+                    rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(routingKey));
+
+                    LOGGER.debug(String.format("Successfully declared exchange: '%s' for agent: '%s-%s'", name, type, key));
+                }
+                catch (StringExpanderException e)
+                {
+                    throw new AgentConfigurationException(e);
+                }
+            }
+        }
+    }
+
 
     @Override
     public final void removeQueueDefinition(@NonNull QueueType queueType)

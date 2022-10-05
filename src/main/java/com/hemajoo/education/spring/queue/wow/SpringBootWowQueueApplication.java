@@ -4,14 +4,14 @@ import com.hemajoo.education.spring.amqp.agent.PlayerAgent;
 import com.hemajoo.education.spring.amqp.base.agent.AgentConfigurationException;
 import com.hemajoo.education.spring.amqp.base.agent.AgentType;
 import com.hemajoo.education.spring.amqp.base.agent.QueueType;
-import com.hemajoo.education.wow.queue.actor.service.GameEventServiceController;
+import com.hemajoo.education.wow.queue.actor.service.GameAgentController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(basePackageClasses = { GameEventServiceController.class, Runner.class /*, EventService.class, GamePlayerService.class*/ })
+@ComponentScan(basePackageClasses = { GameAgentController.class, Runner.class /*, EventService.class, GamePlayerService.class*/ })
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class SpringBootWowQueueApplication
 {

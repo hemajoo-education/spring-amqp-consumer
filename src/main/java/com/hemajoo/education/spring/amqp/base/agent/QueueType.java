@@ -34,5 +34,5 @@ public enum QueueType
     /**
      * Agent's queue type dedicated to <b>action house</b>.
      */
-    ACTION_HOUSE,
+    AUCTION_HOUSE,
 }
