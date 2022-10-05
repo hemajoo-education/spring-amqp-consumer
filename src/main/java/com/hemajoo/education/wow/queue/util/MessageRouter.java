@@ -1,7 +1,7 @@
 package com.hemajoo.education.wow.queue.util;
 
+import com.hemajoo.education.spring.amqp.core.message.protocol.BaseMessage;
 import com.hemajoo.education.wow.queue.commons.SenderIdentity;
-import com.hemajoo.education.wow.queue.event.message.BaseMessage;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.springframework.amqp.core.Message;
