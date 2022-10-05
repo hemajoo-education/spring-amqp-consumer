@@ -14,8 +14,8 @@
  */
 package com.hemajoo.education.spring.amqp.game.agent.player;
 
-import com.hemajoo.education.spring.amqp.core.agent.IRabbitMQConsumer;
-import com.hemajoo.education.spring.amqp.core.agent.RabbitMQBaseConsumer;
+import com.hemajoo.education.spring.amqp.core.consumer.IRabbitMQConsumer;
+import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQBaseConsumer;
 import com.hemajoo.education.spring.amqp.core.message.protocol.IMessage;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;

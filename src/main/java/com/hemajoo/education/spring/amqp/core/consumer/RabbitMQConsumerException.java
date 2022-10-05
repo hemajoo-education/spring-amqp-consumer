@@ -12,7 +12,7 @@
  * Hemajoo Systems Inc.
  * -----------------------------------------------------------------------------------------------
  */
-package com.hemajoo.education.spring.amqp.core.agent;
+package com.hemajoo.education.spring.amqp.core.consumer;
 
 import com.hemajoo.commons.exception.HemajooException;
 

@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hemajoo.education</groupId>
-    <artifactId>spring-rabbitmq-wow</artifactId>
+    <artifactId>spring-amqp-consumer</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Spring RabbitMQ for WoW</name>
-    <description>Educational project demonstrating the usage of RabbitMQ through the Spring framework to simulate exchange of messages between an event service and a player of a fictional game.</description>
+    <name>Spring AMQP Consumer</name>
+    <description>Educational project demonstrating the usage of RabbitMQ through the Spring framework.</description>
 
     <developers>
 

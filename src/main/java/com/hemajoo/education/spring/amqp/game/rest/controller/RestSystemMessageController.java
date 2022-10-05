@@ -14,7 +14,7 @@
  */
 package com.hemajoo.education.spring.amqp.game.rest.controller;
 
-import com.hemajoo.education.spring.amqp.core.agent.RabbitMQConsumerType;
+import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQConsumerType;
 import com.hemajoo.education.spring.amqp.game.protocol.QueueType;
 import com.hemajoo.education.spring.amqp.game.protocol.message.system.SystemMessage;
 import io.swagger.v3.oas.annotations.Operation;

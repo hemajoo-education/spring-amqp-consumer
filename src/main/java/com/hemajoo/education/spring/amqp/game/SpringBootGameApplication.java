@@ -14,8 +14,8 @@
  */
 package com.hemajoo.education.spring.amqp.game;
 
-import com.hemajoo.education.spring.amqp.core.agent.RabbitMQConsumerException;
-import com.hemajoo.education.spring.amqp.core.agent.RabbitMQConsumerType;
+import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQConsumerException;
+import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQConsumerType;
 import com.hemajoo.education.spring.amqp.game.agent.player.PlayerConsumer;
 import com.hemajoo.education.spring.amqp.game.rest.controller.RestEventMessageController;
 import com.hemajoo.education.spring.amqp.game.rest.controller.RestSystemMessageController;
