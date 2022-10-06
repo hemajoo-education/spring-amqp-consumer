@@ -12,7 +12,7 @@
  * Hemajoo Systems Inc.
  * -----------------------------------------------------------------------------------------------
  */
-package com.hemajoo.education.spring.amqp.game.agent.player;
+package com.hemajoo.education.spring.amqp.game.consumer.player;
 
 import com.hemajoo.education.spring.amqp.core.consumer.IRabbitMQConsumer;
 import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQBaseConsumer;

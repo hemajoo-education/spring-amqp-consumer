@@ -16,9 +16,10 @@ package com.hemajoo.education.spring.amqp.game;
 
 import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQConsumerException;
 import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQConsumerType;
-import com.hemajoo.education.spring.amqp.game.agent.player.PlayerConsumer;
+import com.hemajoo.education.spring.amqp.game.consumer.player.PlayerConsumer;
 import com.hemajoo.education.spring.amqp.game.rest.controller.RestEventMessageController;
 import com.hemajoo.education.spring.amqp.game.rest.controller.RestSystemMessageController;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -27,16 +28,25 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackageClasses = { RestEventMessageController.class, RestSystemMessageController.class, Runner.class })
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
-public class SpringBootGameApplication
+public class SpringBootAmqpConsumerApplication
 {
+    @Value("${amqp.queue.prefix}")
+    private String amqpQueuePrefix;
+
+    @Value("${amqp.queue.template}")
+    private String amqpQueueTemplate;
+
+    @Value("${amqp.exchange.direct.template}")
+    private String amqpDirectExchangeTemplate;
+
     @Bean
     PlayerConsumer playerAgent() throws RabbitMQConsumerException
     {
-        return new PlayerConsumer(RabbitMQConsumerType.PLAYER,"AK098YHFG336QSWX","com.hemajoo.education.spring.amqp.${type}.${key}.default");
+        return new PlayerConsumer(RabbitMQConsumerType.PLAYER,"AK098YHFG336QSWX");
     }
 
     public static void main(String[] args)
     {
-        SpringApplication.run(SpringBootGameApplication.class, args);
+        SpringApplication.run(SpringBootAmqpConsumerApplication.class, args);
     }
 }

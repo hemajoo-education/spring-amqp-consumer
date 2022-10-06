@@ -17,10 +17,13 @@ package com.hemajoo.education.spring.amqp.game.rest.controller;
 import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQConsumerType;
 import com.hemajoo.education.spring.amqp.game.protocol.QueueType;
 import com.hemajoo.education.spring.amqp.game.protocol.message.system.SystemMessage;
+import com.hemajoo.utility.string.StringExpander;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.NonNull;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +36,18 @@ import javax.validation.constraints.NotNull;
 @RequestMapping("/api/v1/amqp/message/system")
 public class RestSystemMessageController
 {
+    @Value("${amqp.variable.placeholder.character}")
+    private String amqpVariablePlaceholderCharacter;
+
+    @Value("${amqp.queue.prefix}")
+    private String amqpPrefix;
+
+    @Value("${amqp.queue.template}")
+    private String amqpPrefixQueue;
+
+    @Value("${amqp.exchange.direct.template}")
+    private String amqpDirectExchange;
+
     private final RabbitTemplate rabbitTemplate;
 
     public RestSystemMessageController(RabbitTemplate rabbitTemplate)
@@ -56,11 +71,9 @@ public class RestSystemMessageController
             @Parameter(description = "Consumer type", required = true) final @NotNull @RequestParam RabbitMQConsumerType consumerType,
             @Parameter(description = "Consumer key") final @RequestParam(required = false) String consumerKey)
     {
-        String queueName = "com.hemajoo.education.spring.amqp." + consumerType + "." + consumerKey + ".system"; // Always sent to the 'system' queue.
-
         SystemMessage message = new SystemMessage(SystemMessage.MessageType.MESSAGE_SYSTEM_CONSUMER_QUEUE_PAUSE, queueType, null);
 
-        rabbitTemplate.convertAndSend(queueName, message); // Directly send a message to a queue
+        rabbitTemplate.convertAndSend(resolveQueueName(consumerType, consumerKey), message); // Directly send a message to a queue
     }
 
     /**
@@ -79,10 +92,19 @@ public class RestSystemMessageController
             @Parameter(description = "Consumer type", required = true) final @NotNull @RequestParam RabbitMQConsumerType consumerType,
             @Parameter(description = "Consumer key") final @RequestParam(required = false) String consumerKey)
     {
-        String queueName = "com.hemajoo.education.spring.amqp." + consumerType + "." + consumerKey + ".system"; // Always sent to the 'system' queue.
-
         SystemMessage message = new SystemMessage(SystemMessage.MessageType.MESSAGE_SYSTEM_CONSUMER_QUEUE_RESUME, queueType, null);
 
-        rabbitTemplate.convertAndSend(queueName, message); // Directly send a message to a queue
+        rabbitTemplate.convertAndSend(resolveQueueName(consumerType, consumerKey), message); // Directly send a message to a queue
+    }
+
+    private String resolveQueueName(final @NonNull RabbitMQConsumerType type, final String key)
+    {
+        String queueName = amqpPrefixQueue;
+
+        queueName = StringExpander.expand(amqpVariablePlaceholderCharacter, queueName, "type", type.name());
+        queueName = StringExpander.expand(amqpVariablePlaceholderCharacter,queueName, "key", key);
+        queueName += QueueType.SYSTEM.getExtension();
+
+        return queueName;
     }
 }

@@ -15,6 +15,7 @@
 package com.hemajoo.education.spring.amqp.core.consumer;
 
 import com.hemajoo.education.spring.amqp.game.protocol.QueueType;
+import com.hemajoo.education.wow.queue.ExchangeType;
 import lombok.NonNull;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
@@ -55,7 +56,7 @@ public interface IRabbitMQConsumer
      */
     SimpleMessageListenerContainer getMessageListenerContainer(final QueueType queueType);
 
-    void addQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName, final @NonNull Object delegate, final String methodListener) throws RabbitMQConsumerException;
+    void createQueue(final @NonNull QueueType queueType, final @NonNull String queueName, final @NonNull Object delegate, final String methodListener) throws RabbitMQConsumerException;
 
     /**
      * Add a queue definition for this <b>RabbitMQ</b> consumer.
@@ -64,11 +65,18 @@ public interface IRabbitMQConsumer
      * @param methodListener If not null, a dynamic message listener will be created for this queue.
      * @throws RabbitMQConsumerException Thrown when an error occurred while configuring a <b>RabbitMQ</b> consumer.
      */
-    void addQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName, final String methodListener) throws RabbitMQConsumerException;
+    void createQueue(final @NonNull QueueType queueType, final @NonNull String queueName, final String methodListener) throws RabbitMQConsumerException;
 
-    void removeQueueDefinition(final @NonNull QueueType queueType);
+    void deleteQueue(final @NonNull QueueType queueType);
 
-    void updateQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName);
+    void updateQueue(final @NonNull QueueType queueType, final @NonNull String queueName);
 
-    void addDirectExchangeDefinition(final @NonNull QueueType queueType, final @NonNull String exchangeName, final String routingKey) throws RabbitMQConsumerException;
+    /**
+     * Add an exchange to the consumer.
+     * @param queueType Queue type.
+     * @param exchangeType Exchange type.
+     * @param exchangeName Exchange name.
+     * @param routingKey Routing key.
+     */
+    void addExchange(final @NonNull QueueType queueType, final @NonNull ExchangeType exchangeType, final @NonNull String exchangeName, final String routingKey);
 }

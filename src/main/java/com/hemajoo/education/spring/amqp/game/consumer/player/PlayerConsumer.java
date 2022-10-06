@@ -12,7 +12,7 @@
  * Hemajoo Systems Inc.
  * -----------------------------------------------------------------------------------------------
  */
-package com.hemajoo.education.spring.amqp.game.agent.player;
+package com.hemajoo.education.spring.amqp.game.consumer.player;
 
 import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQBaseConsumer;
 import com.hemajoo.education.spring.amqp.core.consumer.RabbitMQConsumerException;
@@ -34,9 +34,9 @@ public class PlayerConsumer extends RabbitMQBaseConsumer
     @Getter
     private final PlayerMessageEventService eventService;
 
-    public PlayerConsumer(final RabbitMQConsumerType type, final String key, final @NonNull String defaultQueueName) throws RabbitMQConsumerException
+    public PlayerConsumer(final RabbitMQConsumerType type, final String key) throws RabbitMQConsumerException
     {
-        super(type, key, QueueType.DEFAULT, defaultQueueName);
+        super(type, key);
 
         this.eventService = new PlayerMessageEventService(this);
     }
@@ -69,9 +69,9 @@ public class PlayerConsumer extends RabbitMQBaseConsumer
         sleep(1);
     }
 
-    public void onChatMessage(@NonNull IMessage message)
+    public void onChatMessage(final @NonNull IMessage message)
     {
-        LOGGER.debug(String.format("Agent: '%s:%s' received message with category: '%s', type: '%s'", getType(), getKey(), message.getType().getCategoryType(), message.getType()));
+        LOGGER.debug(String.format("'%s:%s' received chat message: '%s'", getType(), getKey(), message.toString()));
 
         sleep(1);
     }

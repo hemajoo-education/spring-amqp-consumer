@@ -14,10 +14,13 @@
  */
 package com.hemajoo.education.spring.amqp.game;
 
-import com.hemajoo.education.spring.amqp.game.agent.player.PlayerConsumer;
+import com.hemajoo.education.spring.amqp.game.consumer.player.PlayerConsumer;
+import com.hemajoo.education.spring.amqp.game.consumer.player.PlayerQueueListenerType;
 import com.hemajoo.education.spring.amqp.game.protocol.QueueType;
+import com.hemajoo.education.wow.queue.ExchangeType;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -25,40 +28,112 @@ import org.springframework.stereotype.Component;
 @Component
 public class Runner implements CommandLineRunner
 {
+    @Value("${amqp.variable.placeholder.character}")
+    private String amqpVariablePlaceholderCharacter;
+
+    @Value("${amqp.queue.prefix}")
+    private String amqpQueuePrefix;
+
+    @Value("${amqp.queue.template}")
+    private String amqpQueueTemplate;
+
+    @Value("${amqp.exchange.direct.template}")
+    private String amqpDirectExchangeTemplate;
+
     @Autowired
     private PlayerConsumer player;
 
     @Override
     public void run(String... args) throws Exception
     {
-        // Create a dedicated queue for EVENT messages
-        player.addQueueDefinition(
+        // Create queues
+        player.createQueue(
+                QueueType.DEFAULT,
+                amqpQueueTemplate,
+                PlayerQueueListenerType.DEFAULT.getMessageListenerName());
+        player.createQueue(
                 QueueType.EVENT,
-                "com.hemajoo.education.spring.amqp.${type}.${key}.event",
-                player.getEventService(),
-                "onEventMessage");
+                amqpQueueTemplate,
+                PlayerQueueListenerType.EVENT.getMessageListenerName());
+        player.createQueue(
+                QueueType.CHAT,
+                amqpQueueTemplate,
+                PlayerQueueListenerType.CHAT.getMessageListenerName());
+        player.createQueue(
+                QueueType.SYSTEM,
+                amqpQueueTemplate,
+                PlayerQueueListenerType.SYSTEM.getMessageListenerName());
+        player.createQueue(
+                QueueType.BANK,
+                amqpQueueTemplate,
+                PlayerQueueListenerType.BANK.getMessageListenerName());
+        player.createQueue(
+                QueueType.POSTAL,
+                amqpQueueTemplate,
+                PlayerQueueListenerType.POSTAL.getMessageListenerName());
+        player.createQueue(
+                QueueType.QUEST,
+                amqpQueueTemplate,
+                PlayerQueueListenerType.QUEST.getMessageListenerName());
+        player.createQueue(
+                QueueType.AUCTION_HOUSE,
+                amqpQueueTemplate,
+                PlayerQueueListenerType.AUCTION_HOUSE.getMessageListenerName());
+        player.createQueue(
+                QueueType.ZONE,
+                amqpQueueTemplate,
+                PlayerQueueListenerType.ZONE.getMessageListenerName());
 
-        // Create a dedicated queue for CHAT messages
-        player.addQueueDefinition(QueueType.CHAT, "com.hemajoo.education.spring.amqp.${type}.${key}.chat", "onChatMessage");
-        player.addQueueDefinition(QueueType.SYSTEM, "com.hemajoo.education.spring.amqp.${type}.${key}.system", "onSystemMessage");
-
-        // Create a dedicated queue for AUCTION_HOUSE messages
-        player.addQueueDefinition(QueueType.AUCTION_HOUSE, "com.hemajoo.education.spring.amqp.${type}.${key}.ah", "onAuctionHouseMessage");
-
-        // Create a direct exchange and a binding for the EVENT routing key
-        // All EVENT messages will be routed to the EVENT queue
-        player.addDirectExchangeDefinition(QueueType.EVENT, "com.hemajoo.education.spring.amqp.${type}.${key}.direct-exchange", "EVENT");
-
-        // Create a direct exchange and a binding for the CHAT routing key
-        // All EVENT messages will be routed to the CHAT queue
-        player.addDirectExchangeDefinition(QueueType.CHAT, "com.hemajoo.education.spring.amqp.${type}.${key}.direct-exchange", "CHAT");
-        player.addDirectExchangeDefinition(QueueType.SYSTEM, "com.hemajoo.education.spring.amqp.${type}.${key}.direct-exchange", "SYSTEM");
-        player.addDirectExchangeDefinition(QueueType.BANK, "com.hemajoo.education.spring.amqp.${type}.${key}.direct-exchange", "BANK");
-        player.addDirectExchangeDefinition(QueueType.POSTAL, "com.hemajoo.education.spring.amqp.${type}.${key}.direct-exchange", "POSTAL");
-        player.addDirectExchangeDefinition(QueueType.QUEST, "com.hemajoo.education.spring.amqp.${type}.${key}.direct-exchange", "QUEST");
-
-        // Create a direct exchange and a binding for the AUCTION_HOUSE routing key
-        // All EVENT messages will be routed to the AUCTION_HOUSE queue
-        player.addDirectExchangeDefinition(QueueType.AUCTION_HOUSE, "com.hemajoo.education.spring.amqp.${type}.${key}.direct-exchange", "AUCTION_HOUSE");
+        // Create direct exchanges & bindings
+        player.addExchange(
+                QueueType.DEFAULT,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.DEFAULT.getRoutingKey());
+        player.addExchange(
+                QueueType.DEFAULT,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.DEFAULT.getRoutingKey());
+        player.addExchange(
+                QueueType.EVENT,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.EVENT.getRoutingKey());
+        player.addExchange(
+                QueueType.CHAT,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.CHAT.getRoutingKey());
+        player.addExchange(
+                QueueType.SYSTEM,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.SYSTEM.getRoutingKey());
+        player.addExchange(
+                QueueType.BANK,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.BANK.getRoutingKey());
+        player.addExchange(
+                QueueType.POSTAL,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.POSTAL.getRoutingKey());
+        player.addExchange(
+                QueueType.QUEST,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.QUEST.getRoutingKey());
+        player.addExchange(
+                QueueType.AUCTION_HOUSE,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.AUCTION_HOUSE.getRoutingKey());
+        player.addExchange(
+                QueueType.ZONE,
+                ExchangeType.DIRECT,
+                amqpDirectExchangeTemplate,
+                PlayerQueueListenerType.ZONE.getRoutingKey());
     }
 }

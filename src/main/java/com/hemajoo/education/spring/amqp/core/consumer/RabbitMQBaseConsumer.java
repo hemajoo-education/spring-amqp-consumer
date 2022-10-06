@@ -17,8 +17,8 @@ package com.hemajoo.education.spring.amqp.core.consumer;
 import com.hemajoo.commons.exception.NotYetImplementedException;
 import com.hemajoo.education.spring.amqp.core.message.protocol.IMessage;
 import com.hemajoo.education.spring.amqp.game.protocol.QueueType;
+import com.hemajoo.education.wow.queue.ExchangeType;
 import com.hemajoo.utility.string.StringExpander;
-import com.hemajoo.utility.string.StringExpanderException;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -34,6 +34,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 
 import java.util.EnumMap;
 
@@ -42,6 +44,7 @@ import java.util.EnumMap;
  * @author <a href="mailto:christophe.resse@gmail.com">Christophe Resse</a>
  * @version 1.0.0
  */
+@PropertySource("classpath:application.properties")
 @Log4j2
 public abstract class RabbitMQBaseConsumer implements IRabbitMQConsumer
 {
@@ -49,6 +52,9 @@ public abstract class RabbitMQBaseConsumer implements IRabbitMQConsumer
      * Name of the listener method used to pull messages from the consumer's <b>default</b> queue.
      */
     private static final String LISTENER_METHOD_DEFAULT = "onDefaultMessage";
+
+    @Value("${amqp.variable.placeholder.character}")
+    private String amqpVariablePlaceholderCharacter;
 
     /**
      * <b>AMQP</b> template object.
@@ -93,19 +99,15 @@ public abstract class RabbitMQBaseConsumer implements IRabbitMQConsumer
      * Create a new <b>RabbitMQ</b> base consumer.
      * @param type Consumer type.
      * @param key Consumer key (identifier).
-     * @param defaultQueueType Consumer default queue type.
-     * @param defaultQueueName Consumer default queue name
      * @throws RabbitMQConsumerException Thrown when an error occurred while configuring a <b>RabbitMQ</b> consumer.
      */
-    protected RabbitMQBaseConsumer(final RabbitMQConsumerType type, final String key, final QueueType defaultQueueType, final @NonNull String defaultQueueName) throws RabbitMQConsumerException
+    protected RabbitMQBaseConsumer(final RabbitMQConsumerType type, final String key) throws RabbitMQConsumerException
     {
         this.type = type;
         this.key = key == null ? RandomStringUtils.random(16, true, true).toUpperCase() : key;
         this.connectionFactory = new CachingConnectionFactory("localhost"); // TODO Should be externalized
-        this.rabbitTemplate = new RabbitTemplate(connectionFactory);
+        this.rabbitTemplate = new RabbitTemplate(connectionFactory); // Serialized message converter
         this.rabbitAdmin = new RabbitAdmin(connectionFactory);
-
-        addQueueDefinition(defaultQueueType, defaultQueueName, LISTENER_METHOD_DEFAULT);
     }
 
     @Override
@@ -123,86 +125,94 @@ public abstract class RabbitMQBaseConsumer implements IRabbitMQConsumer
     }
 
     @Override
-    public final void addQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName, final String methodListener) throws RabbitMQConsumerException
+    public final void createQueue(final @NonNull QueueType queueType, final @NonNull String queueName, final String methodListener) throws RabbitMQConsumerException
     {
-        addQueueDefinition(queueType, queueName, this, methodListener);
+        createQueue(queueType, queueName, this, methodListener);
     }
 
     @Override
-    public final void addQueueDefinition(final @NonNull QueueType queueType, final @NonNull String queueName, final @NonNull Object delegate, final String methodListener) throws RabbitMQConsumerException
+    public final void createQueue(final @NonNull QueueType queueType, final @NonNull String queueName, final @NonNull Object delegate, final String methodListener) throws RabbitMQConsumerException
     {
-        String name = queueName;
+        String name = queueName + queueType.getExtension();
 
         if (queues.containsKey(queueType))
         {
             throw new RabbitMQConsumerException(String.format("Cannot declare queue: '%s' for agent: '%s-%s' because a queue is already declared for type: '%s'!", queueName, type, key, queueType));
         }
 
-        if (StringExpander.containsVariable(name))
+        name = StringExpander.expand(amqpVariablePlaceholderCharacter, name, "type", type.name().toUpperCase());
+        name = StringExpander.expand(amqpVariablePlaceholderCharacter, name, "key", key);
+
+        Queue queue = new Queue(name);
+        queues.put(queueType, queue);
+        rabbitAdmin.declareQueue(queue);
+
+        LOGGER.debug(String.format("Declared queue: '%s' for consumer: '%s-%s'", name, type, key));
+
+        if (methodListener != null)
         {
-            try
-            {
-                name = StringExpander.expandVariables(this, name);
-                Queue queue = new Queue(name);
-                queues.put(queueType, queue);
-                rabbitAdmin.declareQueue(queue);
+            SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+            container.setConnectionFactory(connectionFactory);
+            container.setQueueNames(name);
+            container.setMessageListener(new MessageListenerAdapter(delegate, methodListener));
 
-                LOGGER.debug(String.format("Successfully declared queue: '%s' for agent: '%s-%s'", name, type, key));
-
-                if (methodListener != null)
-                {
-                    SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-                    container.setConnectionFactory(connectionFactory);
-                    container.setQueueNames(name);
-                    container.setMessageListener(new MessageListenerAdapter(delegate, methodListener));
-                    container.start();
-                    containers.put(queueType, container);
-                }
-            }
-            catch (StringExpanderException e)
-            {
-                throw new RabbitMQConsumerException(e);
-            }
+            container.start();
+            containers.put(queueType, container);
         }
     }
 
     @Override
-    public final void addDirectExchangeDefinition(final @NonNull QueueType queueType, final @NonNull String exchangeName, final String routingKey) throws RabbitMQConsumerException
+    public final void addExchange(final @NonNull QueueType queueType, final @NonNull ExchangeType exchangeType, final @NonNull String exchangeName, final String routingKey)
     {
-        String name;
+        switch (exchangeType)
+        {
+            case DIRECT:
+                createDirectExchange(queueType, exchangeName, routingKey);
+                break;
 
+            case TOPIC:
+                break;
+
+            case FANOUT:
+                break;
+
+            case HEADER:
+                break;
+        }
+    }
+
+    /**
+     * Create a direct exchange and its binding.
+     * @param queueType Queue type.
+     * @param exchangeName Direct exchange name.
+     * @param routingKey Routing key.
+     */
+    private void createDirectExchange(final @NonNull QueueType queueType, final @NonNull String exchangeName, final String routingKey)
+    {
+        String name = exchangeName;
         Queue queue = getQueue(queueType);
 
         if (queue != null)
         {
-            if (StringExpander.containsVariable(exchangeName))
-            {
-                try
-                {
-                    name = StringExpander.expandVariables(this, exchangeName);
-                    DirectExchange exchange = new DirectExchange(name);
-                    rabbitAdmin.declareExchange(exchange);
-                    rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(routingKey));
+            name = StringExpander.expand(amqpVariablePlaceholderCharacter, name, "type", type.name().toUpperCase());
+            name = StringExpander.expand(amqpVariablePlaceholderCharacter, name, "key", key);
+            DirectExchange exchange = new DirectExchange(name);
+            rabbitAdmin.declareExchange(exchange);
+            rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(routingKey));
 
-                    LOGGER.debug(String.format("Successfully declared exchange: '%s' for agent: '%s-%s'", name, type, key));
-                }
-                catch (StringExpanderException e)
-                {
-                    throw new RabbitMQConsumerException(e);
-                }
-            }
+            LOGGER.debug(String.format("Declared direct exchange: '%s' for consumer: '%s-%s'", name, type, key));
         }
     }
 
 
     @Override
-    public final void removeQueueDefinition(@NonNull QueueType queueType)
+    public final void deleteQueue(@NonNull QueueType queueType)
     {
         throw new NotYetImplementedException("Not yet implemented!");
     }
 
     @Override
-    public final void updateQueueDefinition(@NonNull QueueType queueType, @NonNull String queueName)
+    public final void updateQueue(@NonNull QueueType queueType, @NonNull String queueName)
     {
         throw new NotYetImplementedException("Not yet implemented!");
     }

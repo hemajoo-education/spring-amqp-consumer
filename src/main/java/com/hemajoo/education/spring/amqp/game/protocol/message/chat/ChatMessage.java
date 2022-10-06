@@ -10,15 +10,15 @@ import lombok.NonNull;
 import lombok.ToString;
 
 @ToString(callSuper = true)
-@Schema(description = "Chat notification message")
-public class ChatNotificationMessage extends BaseMessage
+@Schema(description = "Chat message")
+public class ChatMessage extends BaseMessage
 {
     public enum MessageType implements IMessageType
     {
         // Notify of a chat message.
         MESSAGE_CHAT_NOTIFICATION(
                 MessageCategoryType.MESSAGE_CATEGORY_CHAT,
-                String.class);
+                ChatMessageContent.class);
         /**
          * Message category.
          */
@@ -55,7 +55,7 @@ public class ChatNotificationMessage extends BaseMessage
      * @param content Message content.
      * @param sender Sender.
      */
-    public ChatNotificationMessage(final @NonNull IMessageType messageType, final Object content, final SenderIdentity sender)
+    public ChatMessage(final @NonNull IMessageType messageType, final Object content, final SenderIdentity sender)
     {
         super(messageType, content, sender);
     }
